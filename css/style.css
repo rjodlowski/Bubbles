@@ -1,0 +1,72 @@
+body,
+html {
+	margin: 0 auto;
+	width: 100vw;
+	height: 100vh;
+}
+
+#gameTable {
+	outline: 1px solid black;
+	border-spacing: 1px;
+	display: flex;
+	flex-direction: column;
+}
+
+.row {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;	
+}
+
+.field {
+	width: 35px;
+	height: 35px;
+	border: 1px solid black;
+	cursor: pointer;
+}
+
+.flex-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* Preview */
+#preview {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	/* border: 1px solid black; */
+	flex-direction: column;
+}
+
+#incoming{
+	/* border: 1px solid black; */
+	width: 115px;
+	height: 40px;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	flex-direction: row;
+
+}
+
+.ball {
+	width: 27px;
+	height: 27px;
+	border: 1px solid black;
+	border-radius: 50%;
+	box-sizing: border-box;
+	cursor: pointer;
+}
+
+.ball-preview {
+	cursor: auto;
+}
+
+.ball-selected {
+	width: 33px;
+	height: 33px;
+	cursor: pointer;
+}
