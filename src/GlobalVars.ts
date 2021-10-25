@@ -32,6 +32,16 @@ export default class GlobalVars {
     ballsCanBeSelected: boolean = true; // Enables click event on every ball
     selectedBall: number[] = undefined;
 
+
+    pathfindingDone: boolean = false;
+    colorStartFound: boolean = false;
+
+    // Colors
+    colorFind: boolean = true; // [R, G]
+    pathProjectionColor: string = "purple";
+    pathSelectionColor: string = "grey";
+
+
     constructor() {
         // Something
         this.main = document.getElementById("main") as HTMLDivElement;

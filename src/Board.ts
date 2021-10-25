@@ -82,13 +82,21 @@ export default class Board {
 
 
         if (this.gv.selectedBall != undefined) {
-            if (target.parentNode.childElementCount == this.gv.width) {
-                console.log(Board.idToArray(id));
-                this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
-                this.pathfinding2.start();
+            if (!this.gv.pathfindingDone) {
+                if (target.parentNode.childElementCount == this.gv.width) {
+                    console.log(Board.idToArray(id));
+                    this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
+                    this.pathfinding2.start();
+                    this.gv.pathfindingDone = true
+                }
+            } else {
+                if (target.parentNode.childElementCount == this.gv.width) {
+                    this.pathfinding2 = new Pathfinding2(this.gv)
+                    this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
+                    this.pathfinding2.start();
+                }
             }
         }
-
     }
 
     /**

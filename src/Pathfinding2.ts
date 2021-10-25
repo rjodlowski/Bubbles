@@ -38,6 +38,10 @@ export default class Pathfinding2 implements IPathfinding {
     iterations: number;
     currIterations: number;
     interval: ReturnType<typeof setInterval>
+    colorBackInterval: ReturnType<typeof setInterval>
+
+    isFound: boolean;
+    colorFind: boolean;
 
     getFCost: () => number;
     getHCost: IGetCost;
@@ -46,6 +50,7 @@ export default class Pathfinding2 implements IPathfinding {
     constructor(globalVars: GlobalVars) {
         console.log("class Pathfinding2 - A* created");
         this.gv = globalVars;
+        this.gv.colorStartFound = false;
 
         this.startNode, this.endNode;
         this.open = [];
@@ -53,6 +58,9 @@ export default class Pathfinding2 implements IPathfinding {
 
         this.iterations = 4;
         this.currIterations = 0;
+        this.isFound = false
+
+        this.colorFind = this.gv.colorFind;
     }
 
     /**
@@ -67,6 +75,7 @@ export default class Pathfinding2 implements IPathfinding {
         this.endCoords = Board.idToArray(endId);
         this.startNode = this.createNode(startId);
         this.endNode = this.createNode(endId);
+        this.clearColoring()
         this.prepareStart();
     }
 
@@ -99,77 +108,87 @@ export default class Pathfinding2 implements IPathfinding {
         console.clear();
 
         // 1) loop
-        this.interval = setInterval(function () {
+        while (!this.isFound) {
+            // this.interval = setInterval(function () {
+
             // if (this.currIterations < this.iterations) {
             // 2) current - node in OPEN with the lowest f_cost
             this.current = this.getOpenLowestF();
-            console.log(this.current.field);
-            console.log(this.current.f);
+            // If there is a path to the end node
+            if (this.current != undefined) {
+                // console.log(this.current.field);
+                // console.log(this.current.f);
 
-            // console.log("1)", this.current);
-            this.current.field.style.backgroundColor = "red";
-            let index: number = this.open.indexOf(this.current);
-            // console.log("2.5)", index);
+                // console.log("1)", this.current);
+                if (this.colorFind) this.current.field.style.backgroundColor = "red";
+                let index: number = this.open.indexOf(this.current);
+                // console.log("2.5)", index);
 
-            // 3) + 4) Remove current from OPEN and add to CLOSED
-            console.log(this.open, this.closed);
-            let node = this.open.splice(index, 1)
-            this.closed.push(node[0]);
-            console.log(this.open, this.closed);
+                // 3) + 4) Remove current from OPEN and add to CLOSED
+                // console.log(this.open, this.closed);
+                let node = this.open.splice(index, 1)
+                this.closed.push(node[0]);
+                // console.log(this.open, this.closed);
 
-            // 5) If current is the target node
-            if (this.current.y == this.endNode.y && this.current.x == this.endNode.x) {
-                console.log("End node found");
-                // 6) return -> color the path (how to know which one?? -> parents??)
-                // break;
-                clearInterval(this.interval)
+                // 5) If current is the target node
+                if (this.current.y == this.endNode.y && this.current.x == this.endNode.x) {
+                    console.log("End node found");
+                    this.isFound = true;
+                    // 6) return -> color the path (how to know which one?? -> parents??)
+                    // break;
+                    clearInterval(this.interval)
 
-            }
-            this.neighbours = this.getNeighbours();
-            // 7) foreach neighbour of the current node
-
-            for (let i: number = 0; i < this.neighbours.length; i++) {
-                let neighbour: INode = this.neighbours[i];
-                let cIncludes = this.including(this.closed, neighbour)
-                console.log("7) CLOSED includes: ", cIncludes);
-
-                // 8) if neighbour is not traversable or neighbour is in CLOSED
-                if (neighbour.isBall) {
-                    // 9) skip to the next neighbour
-                    console.log("Balls!");
-                    continue;
-
-                } else if (cIncludes) {
-                    console.log("Next!");
-                    continue;
-
+                    // Mark end node found
+                    if (this.colorFind) this.current.field.style.backgroundColor = "orange";
+                    this.goBack(this.current)
                 }
+                this.neighbours = this.getNeighbours();
+                // 7) foreach neighbour of the current node
 
-                let oIncludes = this.including(this.open, neighbour)
-                // 10) if new path to neighbour is shorter OR neighbour is not in OPEN
-                if (!oIncludes) {
-                    // 11) set F cost of neighbour
-                    neighbour.f = Pathfinding2.getFCost(neighbour.g, neighbour.h);
+                for (let i: number = 0; i < this.neighbours.length; i++) {
+                    let neighbour: INode = this.neighbours[i];
+                    let cIncludes = this.including(this.closed, neighbour)
+                    // console.log("7) CLOSED includes: ", cIncludes);
 
-                    // 12) set parent of neighbour to current
-                    neighbour.parent = [this.current.y, this.current.x];
+                    // 8) if neighbour is not traversable or neighbour is in CLOSED
+                    if (neighbour.isBall) {
+                        // 9) skip to the next neighbour
+                        // console.log("Balls!");
+                        continue;
 
-                    // 13) if neighbour is not in OPEN
-                    if (!oIncludes) {
-                        // 14) add neighbour to OPEN
-                        this.open.push(neighbour);
-                        neighbour.field.style.backgroundColor = "green";
+                    } else if (cIncludes) {
+                        // console.log("Next!");
+                        continue;
+
                     }
+
+                    let oIncludes = this.including(this.open, neighbour)
+                    // 10) if new path to neighbour is shorter OR neighbour is not in OPEN
+                    if (!oIncludes) {
+                        // 11) set F cost of neighbour
+                        neighbour.f = Pathfinding2.getFCost(neighbour.g, neighbour.h);
+
+                        // 12) set parent of neighbour to current
+                        neighbour.parent = [this.current.y, this.current.x];
+
+                        // 13) if neighbour is not in OPEN
+                        if (!oIncludes) {
+                            // 14) add neighbour to OPEN
+                            this.open.push(neighbour);
+                            if (this.colorFind) neighbour.field.style.backgroundColor = "green";
+                        }
+                    }
+                    this.currIterations++;
                 }
-                // }
-                this.currIterations++;
+            } else {
+                console.log("koniec szmaciuro");
+                this.goBack(this.findLowestF(this.closed))
+                break;
             }
 
-        }.bind(this), 500);
+            // }.bind(this), 500);
 
-        // change the loop after its confirmed working properly
-        // while (true) {
-        // }
+        } // while brace
     }
 
     /**
@@ -296,11 +315,16 @@ export default class Pathfinding2 implements IPathfinding {
         return neighbours;
     }
 
+    /**
+     * Creates a node
+     * @param id "y-x"
+     * @returns node object
+     */
     createNode(id: string): INode {
         let coordsArray = Board.idToArray(id);
 
         // Check if has a ball inside
-        console.log(id);
+        // console.log(id);
         let div: HTMLDivElement = document.getElementById(id) as HTMLDivElement;
         let ballInside: boolean = false;
         if (div.childElementCount > 0) {
@@ -319,5 +343,66 @@ export default class Pathfinding2 implements IPathfinding {
             parent: undefined,
         }
         return node;
+    }
+
+    /**
+     * Clears previous' pathfinding algoirthm coloring
+     */
+    clearColoring() {
+        if (this.colorFind) {
+            for (let y = 0; y < this.gv.height; y++) {
+                for (let x = 0; x < this.gv.width; x++) {
+                    let div = document.getElementById(Board.arrayToId([y, x]))
+                    div.style.backgroundColor = "";
+                }
+            }
+        }
+    }
+
+    /**
+     * Finds node with the lowest F cost in the passed array
+     * @param list target list of objects
+     * @returns a whole node
+     */
+    findLowestF(list: INode[]): INode {
+        let result: INode;
+        let lowest: number = Number.POSITIVE_INFINITY;
+        let tmp: number;
+
+        for (let i: number = 0; i < list.length; i++) {
+            tmp = list[i].f;
+            if (tmp < lowest) {
+                tmp = lowest
+                result = list[i];
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Colors the found path from the end to start
+     * @param endNode End node
+     */
+    goBack(endNode: INode) {
+        console.clear();
+        console.log(endNode, endNode.parent);
+        endNode.field.style.backgroundColor = this.gv.pathProjectionColor;
+        let parentId: string = Board.arrayToId(endNode.parent);
+        let node2: INode = this.closed.find((el) => { return el.stringId == parentId })
+        let parentEl: HTMLDivElement = document.getElementById(parentId) as HTMLDivElement;
+        console.log("closed", this.closed);
+
+        do {
+            parentEl.style.backgroundColor = this.gv.pathProjectionColor;
+            if (node2.parent != undefined) {
+                parentId = Board.arrayToId(node2.parent);
+                node2 = this.closed.find((el) => { return el.stringId == parentId })
+                parentEl = document.getElementById(parentId) as HTMLDivElement;
+                console.log(this.gv.colorStartFound, node2, node2.parent);
+
+            } else {
+                this.gv.colorStartFound = true;
+            }
+        } while (!this.gv.colorStartFound);
     }
 }
