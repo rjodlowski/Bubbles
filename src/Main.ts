@@ -17,13 +17,6 @@ class Main {
         this.gv = globalVars;
     }
 
-    setIncoming() {
-        for (let i: number = 0; i < this.gv.ballsPerRound; i++) {
-
-            // let ball:Ball = new Ball(this.gv, );
-        }
-    }
-
     main() {
         // console.log(this._board);
         // console.log(this._pathfinding);

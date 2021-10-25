@@ -72,28 +72,30 @@ export default class Board {
     clickTile(e: Event) {
         let target: HTMLDivElement = e.target as HTMLDivElement;
         // console.log(target);
-        console.log("clickTile");
+        // console.log("clickTile");
         let id: string = target.id;
 
         // Start pathfinding when an empty field is clicked
-        console.log(target.parentNode.childElementCount);
-        console.log(this.gv.width);
-        console.log(this.gv.selectedBall);
+        // console.log(target.parentNode.childElementCount);
+        // console.log(this.gv.width);
+        // console.log(this.gv.selectedBall);
 
 
         if (this.gv.selectedBall != undefined) {
             if (!this.gv.pathfindingDone) {
                 if (target.parentNode.childElementCount == this.gv.width) {
-                    console.log(Board.idToArray(id));
+                    // console.log(Board.idToArray(id));
                     this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
                     this.pathfinding2.start();
                     this.gv.pathfindingDone = true
                 }
             } else {
-                if (target.parentNode.childElementCount == this.gv.width) {
-                    this.pathfinding2 = new Pathfinding2(this.gv)
-                    this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
-                    this.pathfinding2.start();
+                if (target.childElementCount == 0) {
+                    if (target.parentNode.childElementCount == this.gv.width) {
+                        this.pathfinding2 = new Pathfinding2(this.gv)
+                        this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
+                        this.pathfinding2.start();
+                    }
                 }
             }
         }

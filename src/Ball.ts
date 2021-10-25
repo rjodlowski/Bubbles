@@ -69,6 +69,7 @@ export default class Ball {
                 // console.log("Ball to table, coords: ", this.y, this.x);
 
                 fieldToAddTo.appendChild(this.ball);
+                this.gv.ballsOnBoard.push(this)
 
                 break;
 
@@ -90,24 +91,38 @@ export default class Ball {
      * Adds/removes "ball-selected" class.
      */
     selectBall() {
-        console.log("Ball selected");
+        // console.log("Ball selected");
         // console.log(`Balls can be selected: ${this.gv.ballsCanBeSelected}`);
 
         if (this.gv.ballsCanBeSelected) {
-            if (!this.selected) {
-                if (this.gv.selectedBall == undefined) {
-                    this.selected = !this.selected
-                    this.ball.classList.add("ball-selected");
-                    this.gv.selectedBall = [this.y, this.x]
-                } else {
-                    console.log("You have a ball selected!");
-                }
-            } else {
-                this.selected = !this.selected
-                this.ball.classList.remove("ball-selected")
-                this.gv.selectedBall = undefined;
-            }
+            // console.log("balls can be selected")
+            // console.log(this.selected);
+            // console.log(this.gv.selectedBall);
+            // console.log(this.gv.ballsOnBoard);
 
+
+            if (!this.selected) {
+                // console.log("selecting ball");
+                // Remove all selected classes
+                let a = this.gv.ballsOnBoard.filter((el) => { return el.selected == true })
+                if (a.length > 0) {
+                    a[0].ball.classList.remove("ball-selected");
+                    a[0].selected = false;
+                    this._board.pathfinding2.clearColoring();
+                }
+
+                // Select ball
+                this.selected = true;
+                this.gv.selectedBall = [this.y, this.x];
+                this.ball.classList.add("ball-selected");
+            } else {
+                // console.log("Unselect ball");
+                this.selected = false;
+                this.gv.selectedBall = undefined;
+                this.ball.classList.remove("ball-selected");
+                this._board.pathfinding2.clearColoring();
+            }
+            // console.log("sel after: ", this.gv.ballsOnBoard, this.gv.selectedBall);
         }
     }
 

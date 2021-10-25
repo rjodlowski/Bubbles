@@ -105,7 +105,7 @@ export default class Pathfinding2 implements IPathfinding {
     start() {
         console.log("Start of the pathfinding algorithm");
         console.log(this);
-        console.clear();
+        // console.clear();
 
         // 1) loop
         while (!this.isFound) {
@@ -384,7 +384,7 @@ export default class Pathfinding2 implements IPathfinding {
      * @param endNode End node
      */
     goBack(endNode: INode) {
-        console.clear();
+        // console.clear();
         console.log(endNode, endNode.parent);
         endNode.field.style.backgroundColor = this.gv.pathProjectionColor;
         let parentId: string = Board.arrayToId(endNode.parent);
