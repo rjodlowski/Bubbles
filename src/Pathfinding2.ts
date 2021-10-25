@@ -36,6 +36,7 @@ export default class Pathfinding2 {
 
     iterations: number;
     currIterations: number;
+    interval: ReturnType<typeof setInterval>
 
     constructor(globalVars: GlobalVars) {
         console.log("class Pathfinding2 - A* created");
@@ -45,7 +46,7 @@ export default class Pathfinding2 {
         this.open = [];
         this.closed = [];
 
-        this.iterations = 2;
+        this.iterations = 4;
         this.currIterations = 0;
     }
 
@@ -90,84 +91,76 @@ export default class Pathfinding2 {
     start() {
         console.log("Start of the pathfinding algorithm");
         console.log(this);
+        console.clear();
 
         // 1) loop
-        setInterval(function () {
+        this.interval = setInterval(function () {
+            // if (this.currIterations < this.iterations) {
+            // 2) current - node in OPEN with the lowest f_cost
+            this.current = this.getOpenLowestF();
+            console.log(this.current.field);
+            console.log(this.current.f);
 
-            if (this.currIterations < this.iterations) {
-                console.clear();
+            // console.log("1)", this.current);
+            this.current.field.style.backgroundColor = "red";
+            let index: number = this.open.indexOf(this.current);
+            // console.log("2.5)", index);
 
-                // 2) current - node in OPEN with the lowest f_cost
-                this.current = this.getOpenLowestF();
-                console.log(this.current);
+            // 3) + 4) Remove current from OPEN and add to CLOSED
+            console.log(this.open, this.closed);
+            let node = this.open.splice(index, 1)
+            this.closed.push(node[0]);
+            console.log(this.open, this.closed);
 
-                // Coloring 
-                this.current.field.style.backgroundColor = "red";
+            // 5) If current is the target node
+            if (this.current.y == this.endNode.y && this.current.x == this.endNode.x) {
+                console.log("End node found");
+                // 6) return -> color the path (how to know which one?? -> parents??)
+                // break;
+                clearInterval(this.interval)
 
-                let index: number = this.open.indexOf(this.current);
+            }
+            this.neighbours = this.getNeighbours();
+            // 7) foreach neighbour of the current node
 
-                // 3) + 4) Remove current from OPEN and add to CLOSED
-                console.log("b4", this.open, this.closed);
-                this.closed.push(this.open.splice(index, 1)[0]);
-                console.log("after", this.open, this.closed);
+            for (let i: number = 0; i < this.neighbours.length; i++) {
+                let neighbour: INode = this.neighbours[i];
+                let cIncludes = this.including(this.closed, neighbour)
+                console.log("7) CLOSED includes: ", cIncludes);
 
-                // 5) If current is the target node
-                console.log(this.startNode, this.current, this.endNode);
+                // 8) if neighbour is not traversable or neighbour is in CLOSED
+                if (neighbour.isBall) {
+                    // 9) skip to the next neighbour
+                    console.log("Balls!");
+                    continue;
 
-                if (this.current.y == this.endNode.y && this.current.x == this.endNode.x) {
-                    console.log("End node found");
-                    // 6) return -> color the path (how to know which one?? -> parents??)
-                    // break;
+                } else if (cIncludes) {
+                    console.log("Next!");
+                    continue;
+
                 }
 
-                this.neighbours = this.getNeighbours();
-                console.log(this.neighbours);
-                // 7) foreach neighbour of the current node
-                for (let i: number = 0; i < this.neighbours.length; i++) {
-                    let neighbour: INode = this.neighbours[i];
-                    neighbour.field.style.backgroundColor = "green";
-                    console.log(neighbour);
+                let oIncludes = this.including(this.open, neighbour)
+                // 10) if new path to neighbour is shorter OR neighbour is not in OPEN
+                if (!oIncludes) {
+                    // 11) set F cost of neighbour
+                    neighbour.f = Pathfinding2.getFCost(neighbour.g, neighbour.h);
 
-                    // 8) if neighbour is not traversable or neighbour is in CLOSED
-                    if (neighbour.isBall || this.closed.includes(neighbour)) {
-                        // 9) skip to the next neighbour
-                        console.log("Next!");
-                        continue;
-                    }
+                    // 12) set parent of neighbour to current
+                    neighbour.parent = [this.current.y, this.current.x];
 
-                    // 10) if new path to neighbour is shorter OR neighbour is not in OPEN
-                    // console.log(!this.closed.includes(neighbour));
-                    if (!this.closed.includes(neighbour)) {
-                        console.log("does not include");
-                        // console.log(this.open, this.closed);
-                        // ------------- works to here 
-
-                        // 11) set F cost of neighbour
-                        neighbour.f = Pathfinding2.getFCost(neighbour.g, neighbour.h);
-                        console.log(neighbour.f);
-
-
-                        // 12) set parent of neighbour to current
-                        neighbour.parent = [this.current.y, this.current.x];
-
-                        // 13) if neighbour is not in OPEN
-
-                        console.log(this.open);
-                        console.log(neighbour);
-                        console.log(this.open.includes(neighbour));
-
-                        if (!this.open.includes(neighbour)) {
-                            // 14) add neighbour to OPEN
-                            console.log("Adding neighbour");
-                            this.open.push(neighbour);
-                        }
-                        console.log(this.open);
+                    // 13) if neighbour is not in OPEN
+                    if (!oIncludes) {
+                        // 14) add neighbour to OPEN
+                        this.open.push(neighbour);
+                        neighbour.field.style.backgroundColor = "green";
                     }
                 }
+                // }
                 this.currIterations++;
             }
 
-        }.bind(this), 5000);
+        }.bind(this), 500);
 
         // change the loop after its confirmed working properly
         // while (true) {
@@ -175,11 +168,27 @@ export default class Pathfinding2 {
     }
 
     /**
+     * checks if CLOSED list includes specified element (y, x comparison)
+     * @param motherList the list to check if has the el 
+     * @param el node to esarch for in the closed list
+     */
+    including(motherList: INode[], neighbour: INode): boolean {
+        let foundList: INode[] = motherList.filter((el) => { return el.x == neighbour.x && el.y == neighbour.y })
+        let found: boolean = false;
+        if (foundList.length > 0) {
+            found = true;
+        }
+        // console.log("found: ", foundList, foundList.length);
+
+        return found;
+    }
+
+    /**
      * Finds a node with the lowest F cost in the OPEN array
      * @returns node {INode}
      */
     getOpenLowestF(): INode {
-        console.log("open: ", this.open);
+        // console.log("open: ", this.open);
 
         let nodeWithLowestF: INode = this.open[0];
 
@@ -189,13 +198,15 @@ export default class Pathfinding2 {
             }
         }
 
-        console.log(nodeWithLowestF);
+        // console.log(nodeWithLowestF);
 
         return nodeWithLowestF;
     }
 
     /**
      * Calculates the F cost in a node
+     * @param G cost
+     * @param H cost
      * @returns G cost + H cost
      */
     public static getFCost(G: number, H: number): number {
@@ -203,14 +214,14 @@ export default class Pathfinding2 {
     }
 
     /**
-     * Calculates the distance from end node (H cost) or start node (G cost).
-     * @param current -> current node [y, x]
-     * @param target -> first (G) or end (H) node's coords [y, x]
-     * @returns number -> H cost or G cost
+     * Calculates the distance from start node to the current node
+     * @param startNode start node's coords [y, x]
+     * @param current current node [y, x]
+     * @returns G cost
      */
-    public static getHCostOrGCost(current: number[], target: number[]): number {
-        let a: number = Math.abs(target[0] - current[0]) + 1;
-        let b: number = Math.abs(target[1] - current[1]) + 1;
+    public static getGCost(startNode: number[], current: number[]): number {
+        let a: number = Math.abs(current[0] - startNode[0]);
+        let b: number = Math.abs(current[1] - startNode[1]);
         let c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
         // console.log(a, b, c);
         return c;
@@ -220,7 +231,21 @@ export default class Pathfinding2 {
     }
 
     /**
-     * Gets all node's neighbours
+     * Calculates the distance from end node to the current node
+     * @param endNode -> end node's coords [y, x]
+     * @param current -> current node [y, x]
+     * @returns number -> H cost
+     */
+    public static getHCost(endNode: number[], current: number[]): number {
+        let a: number = Math.abs(current[0] - endNode[0]);
+        let b: number = Math.abs(current[1] - endNode[1]);
+        let c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+
+        return c
+    }
+
+    /**
+     * Gets all node's neighbours (top, bottom, left, right)
      * @returns an :INode list of neighbours
      */
     getNeighbours(): INode[] {
@@ -239,7 +264,7 @@ export default class Pathfinding2 {
                     break;
                 case "bottom":
                     // if y parameter + 1< board height
-                    if (this.current.y + 1 <= this.gv.height) {
+                    if (this.current.y + 1 < this.gv.height) {
                         let idBelow: string = Board.arrayToId([this.current.y + 1, this.current.x]);
                         neighbours.push(this.createNode(idBelow));
                     }
@@ -270,6 +295,7 @@ export default class Pathfinding2 {
         let coordsArray = Board.idToArray(id);
 
         // Check if has a ball inside
+        console.log(id);
         let div: HTMLDivElement = document.getElementById(id) as HTMLDivElement;
         let ballInside: boolean = false;
         if (div.childElementCount > 0) {
@@ -282,8 +308,8 @@ export default class Pathfinding2 {
             stringId: id,
             field: div,
             f: undefined,
-            g: Pathfinding2.getHCostOrGCost(coordsArray, this.startCoords),
-            h: Pathfinding2.getHCostOrGCost(coordsArray, this.endCoords),
+            g: Pathfinding2.getGCost(this.startCoords, coordsArray),
+            h: Pathfinding2.getHCost(this.endCoords, coordsArray),
             isBall: ballInside,
             parent: undefined,
         }
