@@ -1,7 +1,8 @@
 import GlobalVars from "./GlobalVars";
 import Board from "./Board";
-import INode from "./iNode";
-
+import INode from "./interfaces/INode";
+import IPathfinding from "./interfaces/IPathfinding";
+import IGetCost from "./interfaces/IGetCost";
 
 /**
  * Directions: top, bottom, left, right (no diagonal fields)
@@ -20,7 +21,7 @@ import INode from "./iNode";
  * 
 */
 
-export default class Pathfinding2 {
+export default class Pathfinding2 implements IPathfinding {
     gv: GlobalVars;
 
     startNode: INode;
@@ -37,6 +38,10 @@ export default class Pathfinding2 {
     iterations: number;
     currIterations: number;
     interval: ReturnType<typeof setInterval>
+
+    getFCost: () => number;
+    getHCost: IGetCost;
+    getGCost: IGetCost;
 
     constructor(globalVars: GlobalVars) {
         console.log("class Pathfinding2 - A* created");

@@ -1,5 +1,4 @@
 import Ball from "./Ball";
-import INode from "./iNode";
 
 export default class GlobalVars {
     // HTML elements
@@ -8,8 +7,8 @@ export default class GlobalVars {
 
     // Game data
     gameData: Object = {};
-    height: number = 10;
-    width: number = 10;
+    readonly height: number = 10;
+    readonly width: number = 10;
     wallAmount: number = 4;
     sfClicked: number = 0; // start-finish-Clicked
     wallCoords: number[][];

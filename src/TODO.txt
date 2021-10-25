@@ -1,3 +1,24 @@
 --------------- TO DO ---------------
-1) Sth's wrong with the neighbour management -> too much neighbours added
-    to the final list, probably it's not removing them right somehow
+7) Path render, while displaying them set ball not being able to be clicked
+
+
+------------- BUGS ----------------
+1) Pathfinding starts to look at nodes further away 
+    from the end after having a ball as its neighbour
+
+
+--------------- STUFF DONE (SCORING) --------------
+Base (max 100%): 
+    50% - separate files, OOP + types
+    20% - static, midificators, scopes (public), interfaces
+    20% - using a module loader
+
+Points (max 5p):
+    [L1]
+        1.5p - working pathfinding algorithm
+    [L2]
+        0.25p - random ball generation
+    [L3]
+        0.25p - display and placement of random balls
+
+Total: 90% * 2p = 1.8p
