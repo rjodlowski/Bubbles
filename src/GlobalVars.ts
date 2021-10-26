@@ -37,9 +37,12 @@ export default class GlobalVars {
     colorStartFound: boolean = false;
 
     // Colors
-    colorFind: boolean = true; // [R, G]
-    pathProjectionColor: string = "purple";
+    colorFind: boolean = false; // [R, G]
+    pathProjectionColor: string = "red";
     pathSelectionColor: string = "grey";
+
+    mouseOverPathfinding: boolean = false;
+    validStart: boolean = true;
 
 
     constructor() {

@@ -54,6 +54,7 @@ export default class Board {
                 field.id = `${i}-${j}`;
                 field.classList.add("flex-center")
                 field.addEventListener("click", this.clickTile.bind(this))
+                field.addEventListener("mouseenter", this.hoverTile.bind(this))
                 // field.innerText = "0";
                 // field.addEventListener("click", this.setStartFinish.bind(this));
                 row.appendChild(field);
@@ -74,31 +75,166 @@ export default class Board {
         // console.log(target);
         // console.log("clickTile");
         let id: string = target.id;
+        let el: HTMLDivElement = document.getElementById(id) as HTMLDivElement;
+        console.log(el.parentNode);
+
 
         // Start pathfinding when an empty field is clicked
         // console.log(target.parentNode.childElementCount);
         // console.log(this.gv.width);
         // console.log(this.gv.selectedBall);
+        if (el.childElementCount == 1 || el.parentNode.childElementCount == 1) {
+            this.gv.validStart = true;
+        }
 
+        if (this.gv.validStart == true) {
+            console.log(el.childElementCount, el.parentNode.childElementCount);
 
-        if (this.gv.selectedBall != undefined) {
-            if (!this.gv.pathfindingDone) {
-                if (target.parentNode.childElementCount == this.gv.width) {
-                    // console.log(Board.idToArray(id));
-                    this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
-                    this.pathfinding2.start();
-                    this.gv.pathfindingDone = true
-                }
+            if (this.gv.selectedBall != undefined) {
+                console.log("Począteeeeek");
+
+                this.gv.mouseOverPathfinding = true;
+                this.gv.validStart = false;
             } else {
-                if (target.childElementCount == 0) {
+                console.log("No balls");
+                this.gv.selectedBall = undefined;
+                this.gv.mouseOverPathfinding = false;
+                // this.gv.validStart = false;
+            }
+        } else {
+            console.log("Koniecccc");
+            this.gv.validStart = true;
+            let temp: number[] = this.gv.selectedBall;
+            this.gv.selectedBall = undefined;
+            this.gv.mouseOverPathfinding = false;
+
+            // Shut off the game for a second
+            this.gv.ballsCanBeSelected = false;
+            this.updateSelectionColor()
+            setTimeout(() => {
+                console.log("ez");
+                this.pathfinding2.clearColoring();
+                this.performMove(temp, this.pathfinding2.endCoords)
+                // Scout for matches on the board
+
+                // add new balls
+                this.ballsToBoard();
+                // scout for matches after computer added new balls
+
+                // Enable ball selection
+                this.gv.ballsCanBeSelected = true;
+            }, 2000);
+        }
+
+        // Working shit below
+        // if (this.gv.selectedBall != undefined) {
+        //     if (!this.gv.pathfindingDone) {
+        //         if (target.parentNode.childElementCount == this.gv.width) {
+        //             // console.log(Board.idToArray(id));
+        //             // this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
+        //             // this.pathfinding2.start();
+        //             // this.gv.pathfindingDone = true
+
+        //             // add hover listeners
+        //         }
+        //         for (let y: number = 0; y < this.gv.height; y++) {
+        //             for (let x: number = 0; x < this.gv.width; x++) {
+        //                 let field = Board.arrayToId([y, x])
+        //                 document.getElementById(field).addEventListener("mouseenter", this.hoverTile.bind(this))
+        //             }
+        //         }
+        //         this.gv.test = true;
+        //     } else {
+        //         console.log("Konieccccccc");
+        //         this.gv.test = false;
+
+        //         // if (target.childElementCount == 0) {
+        //         //     if (target.parentNode.childElementCount == this.gv.width) {
+        //         //         this.pathfinding2 = new Pathfinding2(this.gv)
+        //         //         this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
+        //         //         this.pathfinding2.start();
+        //         //     }
+        //         // }
+        //     }
+        // }
+    }
+
+    /**
+     * Displays path on hover
+     * @param e event
+     */
+    hoverTile(e: Event) {
+        let target: HTMLDivElement = e.target as HTMLDivElement;
+        let id: string = target.id;
+
+        if (this.gv.mouseOverPathfinding) {
+            // console.log(this.gv.validStart, id);
+            if (this.gv.selectedBall != undefined) {
+                if (!this.gv.pathfindingDone) {
                     if (target.parentNode.childElementCount == this.gv.width) {
-                        this.pathfinding2 = new Pathfinding2(this.gv)
+                        // console.log(Board.idToArray(id));
                         this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
                         this.pathfinding2.start();
+                        this.gv.pathfindingDone = true
+                    }
+                } else {
+                    if (target.childElementCount == 0) {
+                        if (target.parentNode.childElementCount == this.gv.width) {
+                            this.pathfinding2 = new Pathfinding2(this.gv)
+                            this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
+                            this.pathfinding2.start();
+                        }
                     }
                 }
             }
+
         }
+        // else {
+        //     console.log("Nie");
+
+        // }
+    }
+
+    /**
+     * Updates the preview color of the path to the selection one
+     */
+    updateSelectionColor() {
+        for (let y = 0; y < this.gv.height; y++) {
+            for (let x = 0; x < this.gv.width; x++) {
+                let div = document.getElementById(Board.arrayToId([y, x]))
+                if (div.style.backgroundColor == this.gv.pathProjectionColor) {
+                    div.style.backgroundColor = this.gv.pathSelectionColor;
+                }
+            }
+        }
+    }
+
+    /**
+     * Performs a move of a ball to the selected location
+     * @param ballCoords original position
+     */
+    performMove(ballCoords: number[], target: number[]) {
+        // console.log(ballCoords, target);
+
+        let ballToMove: Ball = this.gv.ballsOnBoard.filter((el) => {
+            return el.y == ballCoords[0] && el.x == ballCoords[1];
+        })[0]
+        let ballIndex = this.gv.ballsOnBoard.indexOf(ballToMove);
+        let originEl = document.getElementById(Board.arrayToId(ballCoords))
+        let targetEl = document.getElementById(Board.arrayToId(target))
+
+        // console.log(this.gv.ballsOnBoard, ballIndex, ballToMove, originEl, targetEl);
+
+        // change their div position 
+        originEl.removeChild(ballToMove.ball);
+        targetEl.appendChild(ballToMove.ball);
+        // change their position in globalVars
+        this.gv.ballsOnBoard[ballIndex].y = target[0];
+        this.gv.ballsOnBoard[ballIndex].x = target[1];
+        // Unselect the ball
+        this.gv.ballsOnBoard[ballIndex].unSelect();
+
+        // console.log(this.gv.ballsOnBoard, ballIndex, ballToMove, originEl, targetEl);
     }
 
     /**

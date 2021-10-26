@@ -1,10 +1,16 @@
 --------------- TO DO ---------------
-7) Path render, while displaying them set ball not being able to be clicked
+9) Scout for matches after computer added the balls
+10) In Board.ballsToBoard() check for the lose condition
+    this.gv.ballsOnBoard.length + this.gv.ballsPerRound > this.gv.area 
+11) 
 
 
 ------------- BUGS ----------------
 1) Pathfinding starts to look at nodes further away 
     from the end after having a ball as its neighbour
+2) Freezing path display is only chrome problem
+3) When the start is enclosed, pathfinding tends to go the opposite way, than the ball is located
+4) Pathfinding freaks out, when the end is unreachable
 
 
 --------------- STUFF DONE (SCORING) --------------
@@ -12,13 +18,21 @@ Base (max 100%):
     50% - separate files, OOP + types
     20% - static, midificators, scopes (public), interfaces
     20% - using a module loader
+    // 10% - using at least one decorator
 
 Points (max 5p):
     [L1]
         1.5p - working pathfinding algorithm
     [L2]
         0.25p - random ball generation
+        0.75p - moving, selecting and unselecting the ball
     [L3]
         0.25p - display and placement of random balls
+        0.75p - path preview after hover (no lags)
+    [L4]
+        // 0.75p - matching balls (also diagonally)
+        // 0.25p - points (1 for every matched ball) + game end conditions
+    [L5]
+        // 0.5p - generated documentation
 
-Total: 90% * 2p = 1.8p
+Total: 90% * 3.5p = 3.15p

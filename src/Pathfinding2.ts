@@ -48,7 +48,7 @@ export default class Pathfinding2 implements IPathfinding {
     getGCost: IGetCost;
 
     constructor(globalVars: GlobalVars) {
-        console.log("class Pathfinding2 - A* created");
+        // console.log("class Pathfinding2 - A* created");
         this.gv = globalVars;
         this.gv.colorStartFound = false;
 
@@ -69,7 +69,7 @@ export default class Pathfinding2 implements IPathfinding {
      * @param endId 
      */
     setValues(startId: string, endId: string) {
-        console.log("setting values");
+        // console.log("setting values");
 
         this.startCoords = Board.idToArray(startId);
         this.endCoords = Board.idToArray(endId);
@@ -103,9 +103,10 @@ export default class Pathfinding2 implements IPathfinding {
      * Main body of the A* pathfinding algorithm
      */
     start() {
-        console.log("Start of the pathfinding algorithm");
-        console.log(this);
+        // console.log("Start of the pathfinding algorithm");
+        // console.log(this);
         // console.clear();
+        // this.clearColoring();
 
         // 1) loop
         while (!this.isFound) {
@@ -132,7 +133,7 @@ export default class Pathfinding2 implements IPathfinding {
 
                 // 5) If current is the target node
                 if (this.current.y == this.endNode.y && this.current.x == this.endNode.x) {
-                    console.log("End node found");
+                    // console.log("End node found");
                     this.isFound = true;
                     // 6) return -> color the path (how to know which one?? -> parents??)
                     // break;
@@ -181,7 +182,7 @@ export default class Pathfinding2 implements IPathfinding {
                     this.currIterations++;
                 }
             } else {
-                console.log("koniec szmaciuro");
+                // console.log("koniec");
                 this.goBack(this.findLowestF(this.closed))
                 break;
             }
@@ -349,12 +350,10 @@ export default class Pathfinding2 implements IPathfinding {
      * Clears previous' pathfinding algoirthm coloring
      */
     clearColoring() {
-        if (this.colorFind) {
-            for (let y = 0; y < this.gv.height; y++) {
-                for (let x = 0; x < this.gv.width; x++) {
-                    let div = document.getElementById(Board.arrayToId([y, x]))
-                    div.style.backgroundColor = "";
-                }
+        for (let y = 0; y < this.gv.height; y++) {
+            for (let x = 0; x < this.gv.width; x++) {
+                let div = document.getElementById(Board.arrayToId([y, x]))
+                div.style.backgroundColor = "";
             }
         }
     }
@@ -385,12 +384,12 @@ export default class Pathfinding2 implements IPathfinding {
      */
     goBack(endNode: INode) {
         // console.clear();
-        console.log(endNode, endNode.parent);
+        // console.log(endNode, endNode.parent);
         endNode.field.style.backgroundColor = this.gv.pathProjectionColor;
         let parentId: string = Board.arrayToId(endNode.parent);
         let node2: INode = this.closed.find((el) => { return el.stringId == parentId })
         let parentEl: HTMLDivElement = document.getElementById(parentId) as HTMLDivElement;
-        console.log("closed", this.closed);
+        // console.log("closed", this.closed);
 
         do {
             parentEl.style.backgroundColor = this.gv.pathProjectionColor;
@@ -398,7 +397,7 @@ export default class Pathfinding2 implements IPathfinding {
                 parentId = Board.arrayToId(node2.parent);
                 node2 = this.closed.find((el) => { return el.stringId == parentId })
                 parentEl = document.getElementById(parentId) as HTMLDivElement;
-                console.log(this.gv.colorStartFound, node2, node2.parent);
+                // console.log(this.gv.colorStartFound, node2, node2.parent);
 
             } else {
                 this.gv.colorStartFound = true;

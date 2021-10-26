@@ -137,4 +137,11 @@ export default class Ball {
         destinationField.appendChild(this.ball)
     }
 
+    unSelect() {
+        this.selected = false;
+        this.gv.selectedBall = undefined;
+        this.ball.classList.remove("ball-selected");
+        this._board.pathfinding2.clearColoring();
+    }
+
 }
