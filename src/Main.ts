@@ -1,19 +1,14 @@
 import Board from "./Board";
-import Pathfinding from "./Pathfinding";
 import GlobalVars from "./GlobalVars";
 import Ball from "./Ball";
 
 class Main {
     private _board: Board;
-    private _pathfinding: Pathfinding;
     private gameData: Object = {};
     gv: GlobalVars;
 
     constructor(globalVars: GlobalVars) {
-        console.log("class Main created");
-
-        this._pathfinding = new Pathfinding(globalVars);
-        this._board = new Board(globalVars, this._pathfinding);
+        this._board = new Board(globalVars);
         this.gv = globalVars;
     }
 

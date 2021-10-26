@@ -30,6 +30,7 @@ export default class Pathfinding2 implements IPathfinding {
 
     startCoords: number[];
     endCoords: number[];
+    lastNodeCoords: number[]
 
     open: INode[];
     closed: INode[];
@@ -130,7 +131,7 @@ export default class Pathfinding2 implements IPathfinding {
                 let node = this.open.splice(index, 1)
                 this.closed.push(node[0]);
                 // console.log(this.open, this.closed);
-
+                this.lastNodeCoords = [this.current.y, this.current.x]
                 // 5) If current is the target node
                 if (this.current.y == this.endNode.y && this.current.x == this.endNode.x) {
                     // console.log("End node found");
@@ -160,7 +161,6 @@ export default class Pathfinding2 implements IPathfinding {
                     } else if (cIncludes) {
                         // console.log("Next!");
                         continue;
-
                     }
 
                     let oIncludes = this.including(this.open, neighbour)
@@ -179,17 +179,14 @@ export default class Pathfinding2 implements IPathfinding {
                             if (this.colorFind) neighbour.field.style.backgroundColor = "green";
                         }
                     }
-                    this.currIterations++;
                 }
-            } else {
+            }
+            else {
                 // console.log("koniec");
-                this.goBack(this.findLowestF(this.closed))
+                this.goBack(this.findLowestF(this.closed));
                 break;
             }
-
-            // }.bind(this), 500);
-
-        } // while brace
+        }
     }
 
     /**

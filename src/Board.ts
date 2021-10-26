@@ -1,12 +1,10 @@
 import GlobalVars from "./GlobalVars";
-import Pathfinding from "./Pathfinding";
 import Pathfinding2 from "./Pathfinding2";
 import Ball from "./Ball";
 
 export default class Board {
     // Foreign classes
     gv: GlobalVars;
-    pathfinding: Pathfinding
     pathfinding2: Pathfinding2;
 
     // Class parameters
@@ -19,11 +17,9 @@ export default class Board {
     incomingBalls: Ball[];
     gameBalls: Ball[];
 
-    constructor(globalVars: GlobalVars, pathfindingClass: Pathfinding) {
-        console.log("class Board created");
+    constructor(globalVars: GlobalVars) {
 
         this.gv = globalVars;
-        this.pathfinding = pathfindingClass;
         this.pathfinding2 = new Pathfinding2(this.gv);
 
         this.gameBoard = document.getElementById("main") as HTMLDivElement;
@@ -114,7 +110,7 @@ export default class Board {
             setTimeout(() => {
                 console.log("ez");
                 this.pathfinding2.clearColoring();
-                this.performMove(temp, this.pathfinding2.endCoords)
+                this.performMove(temp, this.pathfinding2.lastNodeCoords)
                 // Scout for matches on the board
 
                 // add new balls

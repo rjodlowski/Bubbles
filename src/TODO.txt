@@ -2,7 +2,7 @@
 9) Scout for matches after computer added the balls
 10) In Board.ballsToBoard() check for the lose condition
     this.gv.ballsOnBoard.length + this.gv.ballsPerRound > this.gv.area 
-11) 
+11) możliwość akceptacji przesunięcia kulki tylko do miejsca dostępnego dla niej
 
 
 ------------- BUGS ----------------
