@@ -28,10 +28,10 @@ export default class GlobalVars {
     incomingBalls: Ball[] = [];
     ballsOnBoard: Ball[] = [];
     ballsPerRound: number = 3;
-    ballCount: number = 0; // Amount of all balls in the game (incoming + on board)
     ballsCanBeSelected: boolean = true; // Enables click event on every ball
     selectedBall: number[] = undefined;
-
+    matchingBalls: number = 3; // The amount of balls that are needed to complete a match
+    ballCount: number = 0;
 
     pathfindingDone: boolean = false;
     colorStartFound: boolean = false;

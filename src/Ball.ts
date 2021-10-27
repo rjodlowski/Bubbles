@@ -35,8 +35,9 @@ export default class Ball {
         // Create element
         this.ball = document.createElement("div");
         this.ball.className = "ball";
+        // this.ball.setAttribute("color", this.color);
         this.ball.style.backgroundColor = this.color;
-        this.ball.setAttribute("color", this.color);
+        console.log(this.color, this.ball.style.backgroundColor);
 
         // Assign id
         this.ball.id = `ball${this.gv.ballCount}`;

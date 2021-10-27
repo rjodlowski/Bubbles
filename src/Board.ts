@@ -115,44 +115,14 @@ export default class Board {
 
                 // add new balls
                 this.ballsToBoard();
+                console.clear();
                 // scout for matches after computer added new balls
-
+                this.matchVertically();
                 // Enable ball selection
                 this.gv.ballsCanBeSelected = true;
             }, 2000);
         }
 
-        // Working shit below
-        // if (this.gv.selectedBall != undefined) {
-        //     if (!this.gv.pathfindingDone) {
-        //         if (target.parentNode.childElementCount == this.gv.width) {
-        //             // console.log(Board.idToArray(id));
-        //             // this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
-        //             // this.pathfinding2.start();
-        //             // this.gv.pathfindingDone = true
-
-        //             // add hover listeners
-        //         }
-        //         for (let y: number = 0; y < this.gv.height; y++) {
-        //             for (let x: number = 0; x < this.gv.width; x++) {
-        //                 let field = Board.arrayToId([y, x])
-        //                 document.getElementById(field).addEventListener("mouseenter", this.hoverTile.bind(this))
-        //             }
-        //         }
-        //         this.gv.test = true;
-        //     } else {
-        //         console.log("Konieccccccc");
-        //         this.gv.test = false;
-
-        //         // if (target.childElementCount == 0) {
-        //         //     if (target.parentNode.childElementCount == this.gv.width) {
-        //         //         this.pathfinding2 = new Pathfinding2(this.gv)
-        //         //         this.pathfinding2.setValues(Board.arrayToId(this.gv.selectedBall), id);
-        //         //         this.pathfinding2.start();
-        //         //     }
-        //         // }
-        //     }
-        // }
     }
 
     /**
@@ -307,57 +277,58 @@ export default class Board {
         }
     }
 
+    matchVertically() {
+        console.log("Matching vertically");
+        // console.log(this.gv.ballsOnBoard);
 
 
-    // setWalls() {
-    //     let xCoords: number[][] = []
+        let ballsToDelete: Ball[][] = []
+        for (let x: number = 0; x < this.gv.width; x++) {
+            let sameColors: Ball[] = []
+            // console.log('==================');
 
-    //     for (let i: number = 0; i < this.gv.wallAmount; i++) {
-    //         let randomY: number = Math.floor(Math.random() * this.gv.height);
-    //         let randomX: number = Math.floor(Math.random() * this.gv.width);
-    //         let field: HTMLTableCellElement = document.getElementById(`${randomY}-${randomX}`) as HTMLTableCellElement;
-    //         if (field.innerText == "X") {
-    //             i--;
-    //         } else {
-    //             field.innerText = "X";
-    //             xCoords.push([randomY, randomX])
-    //         }
-    //     }
-    //     this.gv.wallCoords = xCoords;
-    //     // console.log(this.gv);
-    // };
 
-    // setStartFinish(event: Event) {
-    //     // console.log(this.gv);
+            for (let y: number = 0; y < this.gv.height; y++) {
+                let el: HTMLDivElement = document.getElementById(Board.arrayToId([y, x])) as HTMLDivElement
 
-    //     let target: HTMLTableElement = event.target as HTMLTableElement
-    //     let cell: HTMLTableCellElement = document.getElementById(target.id) as HTMLTableCellElement;
+                // If there is a ball inside
+                if (el.childElementCount > 0) {
+                    let ball: Ball = this.gv.ballsOnBoard.find((el) => { return el.y == y && el.x == x })
+                    // Weird error with different ball.color attibute and actual background color
+                    // ball.color = ball.ball.style.backgroundColor;
+                    // console.log("test: ", ball.color, ball.ball.style.backgroundColor);
+                    // Konsola przekłamuje wartości? działa, mimo, że konsola pokazuje, że nie działa
 
-    //     if (cell.innerText == "X") {
-    //         console.log("No");
-    //     } else if (cell.innerText != "S" && cell.innerText != "T") {
-    //         switch (this.gv.sfClicked) {
-    //             case 0:
-    //                 cell.innerText = "S";
-    //                 this.gv.sCoords = Board.idToArray(cell.id);
-    //                 break;
+                    // If this is the first occurence
+                    if (sameColors.length == 0) {
+                        // console.log("1) ");
+                        sameColors.push(ball)
 
-    //             case 1:
-    //                 cell.innerText = "M";
-    //                 this.gv.fCoords = Board.idToArray(cell.id);
-    //                 console.log(this);
-    //                 this.pathfinding.find([this.gv.sCoords], 1);
-    //                 break;
+                        // Else - There are already balls in the array
+                    } else {
+                        // As long as colors match with the last one, append:
+                        if (sameColors[sameColors.length - 1].color == ball.color) {
+                            // console.log("2) ");
+                            sameColors.push(ball)
+                        } else {
+                            // console.log("3) ");
+                            // console.log("Colors not matching");
+                            // console.log("przed", ballsToDelete, sameColors, ball);
+                            if (sameColors.length >= this.gv.matchingBalls) {
+                                ballsToDelete.push(sameColors);
+                            }
+                            sameColors = [];
+                            sameColors.push(ball)
+                            // console.log("po", ballsToDelete, sameColors, ball);
+                        }
+                    }
+                }
+            }
+            if (sameColors.length >= this.gv.matchingBalls) {
+                ballsToDelete.push(sameColors);
+            }
+        }
+        console.log(ballsToDelete);
 
-    //             default:
-    //                 console.log("No more clicking");
-    //                 console.log(this.gv);
-    //                 break;
-    //         }
-    //         this.gv.sfClicked++;
-    //     } else {
-    //         console.log("Field already occupied!");
-    //     }
-    // };
-
+    }
 }
