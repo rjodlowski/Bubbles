@@ -33,9 +33,9 @@ Points (max 5p):
         0.75p - matching balls (also diagonally)
         0.25p - points (1 for every matched ball) + game end conditions
     [L5]
-        // 0.5p - generated documentation
+        0.5p - generated documentation
 
-Total: 90% * 4.5p = 4.05p
+Total: 90% * 5p = 4.5p
 
 =====================================
 matches 
