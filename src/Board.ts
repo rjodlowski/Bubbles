@@ -1,6 +1,7 @@
 import GlobalVars from "./GlobalVars";
 import Pathfinding2 from "./Pathfinding2";
 import Ball from "./Ball";
+import timer from "./decorartors/timer";
 
 export default class Board {
     // Foreign classes
@@ -71,6 +72,7 @@ export default class Board {
         this.updatePoints();
     };
 
+    @timer
     clickTile(e: Event) {
         let target: HTMLDivElement = e.target as HTMLDivElement;
         // console.log(target);
@@ -121,7 +123,7 @@ export default class Board {
                     // Scout for matches on the board
                     this.matchVertically();
                     this.matchHorizontally();
-                    console.clear()
+                    // console.clear()
                     this.matchDiagonally();
                     // console.clear()
                     this.deleteBalls();
@@ -134,8 +136,15 @@ export default class Board {
                         this.matchHorizontally();
                         this.matchDiagonally();
                         this.deleteBalls();
+                        if (this.gv.ballsOnBoard.length == 0) {
+                            this.gv.win = true;
+                        }
                     }
-                    this.gv.ballsCanBeSelected = true;
+                    if (!this.gv.win) {
+                        this.gv.ballsCanBeSelected = true;
+                    } else {
+                        alert(`Game won! Scored points: ${this.gv.points}`);
+                    }
                 }, 1000);
             }
         }
@@ -252,8 +261,9 @@ export default class Board {
      */
     ballsToBoard() {
         console.log("Moving balls");
+        let newBallSum: number = this.gv.ballsOnBoard.length + this.gv.ballsPerRound
 
-        if (this.gv.ballsOnBoard.length + this.gv.ballsPerRound <= this.gv.area) {
+        if (newBallSum <= this.gv.area) {
             for (let i: number = 0; i < this.gv.ballsPerRound; i++) {
                 // console.log(this.incomingBalls);
                 // Remove from incoming
@@ -366,7 +376,7 @@ export default class Board {
     matchDiagonally() {
         let part = 0;
         let limit = this.gv.width - 1;
-        console.clear();
+        // console.clear();
         let arrayToDelete: Ball[][] = [];
 
         for (let part: number = 0; part < 4; part++) {
@@ -590,4 +600,5 @@ export default class Board {
         let div: HTMLDivElement = document.getElementById("points") as HTMLDivElement;
         div.innerText = `Points: ${this.gv.points}`;
     }
+
 }

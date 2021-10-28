@@ -25,6 +25,14 @@ export default class GlobalVars {
         "yellow",
         "black",
     ];
+    ballNeonColors: string[] = [
+        "red",
+        "green",
+        "blue",
+        "orange",
+        "yellow",
+        "black",
+    ];
     incomingBalls: Ball[] = [];
     ballsOnBoard: Ball[] = [];
     ballsPerRound: number = 3;
@@ -46,6 +54,7 @@ export default class GlobalVars {
 
     points: number = 0;
     gameOver: boolean = false;
+    win: boolean = false;
 
     constructor() {
         // Something
