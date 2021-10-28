@@ -115,9 +115,10 @@ export default class Board {
 
                 // add new balls
                 this.ballsToBoard();
-                console.clear();
+                // console.clear();
                 // scout for matches after computer added new balls
                 this.matchVertically();
+                this.matchDiagonally();
                 // Enable ball selection
                 this.gv.ballsCanBeSelected = true;
             }, 2000);
@@ -330,5 +331,87 @@ export default class Board {
         }
         console.log(ballsToDelete);
 
+    }
+
+    matchDiagonally() {
+        let part = 0;
+        let limit = this.gv.width - 1;
+        console.clear();
+
+        for (let part: number = 0; part < 4; part++) {
+            console.log(`part${part}`);
+            switch (part) {
+                case 0: // top left -> middle
+
+                    let a = (i: number) => {
+                        // console.log("-----")
+                        let x: number = i;
+                        for (let y: number = 0; y <= i; y++) {
+                            if (x >= 0) {
+                                // document.getElementById(Board.arrayToId([y, x])).style.backgroundColor = "pink"
+                                // console.log(y, x);
+                            }
+                            x--
+                        }
+                        i > 0 ? a(i - 1) : 0
+                    }
+                    a(limit);
+                    break;
+
+                case 1: //  middle - > bottom right
+
+                    let b = (i: number) => {
+                        console.log("-----")
+                        let x: number = limit
+                        for (let y: number = limit - i; y <= limit; y++) {
+                            if (x >= limit - i) {
+                                // document.getElementById(Board.arrayToId([y, x])).style.backgroundColor = "purple"
+                                // console.log(y, x);
+                            }
+                            x--
+                        }
+                        i > 0 ? b(i - 1) : 0
+                    }
+                    b(limit - 1)
+                    break;
+
+                case 2: // bottom left -> middle
+                    let c = (i: number) => {
+                        console.log("-----")
+                        let x: number = i;
+                        for (let y: number = limit; y >= limit - i; y--) {
+                            if (x >= 0) {
+                                // document.getElementById(Board.arrayToId([y, x])).style.backgroundColor = "lightblue"
+                                // console.log(y, x);
+                            }
+                            x--
+                        }
+                        i > 0 ? c(i - 1) : 0
+                    }
+                    c(limit);
+                    break;
+
+                case 3: // middle -> top right  
+                    let d = (i: number) => {
+                        console.log("-----")
+                        let x: number = limit;
+                        for (let y: number = i; y >= 0; y--) {
+                            if (x >= limit - i) {
+                                // document.getElementById(Board.arrayToId([y, x])).style.backgroundColor = "brown"
+                                // console.log(y, x);
+                            }
+                            x--
+                        }
+                        i > 0 ? d(i - 1) : 0
+                    }
+                    d(limit - 1)
+                    break;
+
+                default:
+                    console.log("lol");
+
+                    break;
+            }
+        }
     }
 }
