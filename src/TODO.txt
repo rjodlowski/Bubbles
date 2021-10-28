@@ -30,12 +30,12 @@ Points (max 5p):
         0.25p - display and placement of random balls
         0.75p - path preview after hover (no lags)
     [L4]
-        // 0.75p - matching balls (also diagonally)
-        // 0.25p - points (1 for every matched ball) + game end conditions
+        0.75p - matching balls (also diagonally)
+        0.25p - points (1 for every matched ball) + game end conditions
     [L5]
         // 0.5p - generated documentation
 
-Total: 90% * 3.5p = 3.15p
+Total: 90% * 4.5p = 4.05p
 
 =====================================
 matches 

@@ -18,6 +18,8 @@ export default class Board {
     gameBalls: Ball[];
     ballsToDelete: Ball[][];
 
+    deletedBalls: boolean;
+
     constructor(globalVars: GlobalVars) {
 
         this.gv = globalVars;
@@ -66,6 +68,7 @@ export default class Board {
         a.addEventListener("click", this.ballsToBoard.bind(this));
         a.innerText = "More";
         this.preview.appendChild(a);
+        this.updatePoints();
     };
 
     clickTile(e: Event) {
@@ -81,55 +84,61 @@ export default class Board {
         // console.log(target.parentNode.childElementCount);
         // console.log(this.gv.width);
         // console.log(this.gv.selectedBall);
-        if (el.childElementCount == 1 || el.parentNode.childElementCount == 1) {
-            this.gv.validStart = true;
-        }
+        if (!this.gv.gameOver) {
 
-        if (this.gv.validStart == true) {
-            console.log(el.childElementCount, el.parentNode.childElementCount);
+            if (el.childElementCount == 1 || el.parentNode.childElementCount == 1) {
+                this.gv.validStart = true;
+            }
 
-            if (this.gv.selectedBall != undefined) {
-                console.log("Począteeeeek");
+            if (this.gv.validStart == true) {
+                console.log(el.childElementCount, el.parentNode.childElementCount);
 
-                this.gv.mouseOverPathfinding = true;
-                this.gv.validStart = false;
+                if (this.gv.selectedBall != undefined) {
+                    console.log("Począteeeeek");
+
+                    this.gv.mouseOverPathfinding = true;
+                    this.gv.validStart = false;
+                } else {
+                    console.log("No balls");
+                    this.gv.selectedBall = undefined;
+                    this.gv.mouseOverPathfinding = false;
+                    // this.gv.validStart = false;
+                }
             } else {
-                console.log("No balls");
+                console.log("Koniecccc");
+                this.gv.validStart = true;
+                let temp: number[] = this.gv.selectedBall;
                 this.gv.selectedBall = undefined;
                 this.gv.mouseOverPathfinding = false;
-                // this.gv.validStart = false;
+
+                // Shut off the game for a second
+                this.gv.ballsCanBeSelected = false;
+                this.updateSelectionColor()
+                setTimeout(() => {
+                    console.log("ez");
+                    this.pathfinding2.clearColoring();
+                    this.performMove(temp, this.pathfinding2.lastNodeCoords)
+                    // Scout for matches on the board
+                    this.matchVertically();
+                    this.matchHorizontally();
+                    console.clear()
+                    this.matchDiagonally();
+                    // console.clear()
+                    this.deleteBalls();
+
+                    if (!this.deletedBalls) {
+                        // add new balls
+                        this.ballsToBoard();
+
+                        this.matchVertically();
+                        this.matchHorizontally();
+                        this.matchDiagonally();
+                        this.deleteBalls();
+                    }
+                    this.gv.ballsCanBeSelected = true;
+                }, 1000);
             }
-        } else {
-            console.log("Koniecccc");
-            this.gv.validStart = true;
-            let temp: number[] = this.gv.selectedBall;
-            this.gv.selectedBall = undefined;
-            this.gv.mouseOverPathfinding = false;
-
-            // Shut off the game for a second
-            this.gv.ballsCanBeSelected = false;
-            this.updateSelectionColor()
-            setTimeout(() => {
-                console.log("ez");
-                this.pathfinding2.clearColoring();
-                this.performMove(temp, this.pathfinding2.lastNodeCoords)
-                // Scout for matches on the board
-
-                // add new balls
-                this.ballsToBoard();
-                // console.clear();
-                // scout for matches after computer added new balls
-                this.matchVertically();
-                this.matchHorizontally();
-                console.clear()
-                this.matchDiagonally();
-                // console.clear()
-                this.deleteBalls();
-                // Enable ball selection
-                this.gv.ballsCanBeSelected = true;
-            }, 2000);
         }
-
     }
 
     /**
@@ -244,18 +253,24 @@ export default class Board {
     ballsToBoard() {
         console.log("Moving balls");
 
-        for (let i: number = 0; i < this.gv.ballsPerRound; i++) {
-            // console.log(this.incomingBalls);
-            // Remove from incoming
-            let ball = this.incomingBalls.pop();
-            this.incoming.removeChild(ball.ball);
+        if (this.gv.ballsOnBoard.length + this.gv.ballsPerRound <= this.gv.area) {
+            for (let i: number = 0; i < this.gv.ballsPerRound; i++) {
+                // console.log(this.incomingBalls);
+                // Remove from incoming
+                let ball = this.incomingBalls.pop();
+                this.incoming.removeChild(ball.ball);
 
-            // Append to gameTable
-            ball.addTo("main");
+                // Append to gameTable
+                ball.addTo("main");
+            }
+
+            // console.log(this.incomingBalls);
+            this.generateIncoming();
+        } else {
+            alert(`Game over! Score: ${this.gv.points}`);
+            this.gv.gameOver = true;
         }
 
-        // console.log(this.incomingBalls);
-        this.generateIncoming();
     }
 
     /**
@@ -306,44 +321,6 @@ export default class Board {
                     let res = this.appendBallOrNot(isBroken, sameColors, y, x)
                     sameColors = res.colors;
                     isBroken = res.broken;
-
-                    // let ball: Ball = this.gv.ballsOnBoard.find((el) => { return el.y == y && el.x == x })
-                    // // If this is the first occurence
-                    // if (sameColors.length == 0) {
-                    //     // console.log("1) ");
-                    //     sameColors.push(ball)
-                    //     isBroken = false;
-
-                    //     // Else - There are already balls in the array
-                    // } else {
-                    //     // As long as colors match with the last one, append:
-                    //     if (sameColors[sameColors.length - 1].color == ball.color) {
-                    //         // if streak was not broken, append similarly colored ball
-                    //         if (!isBroken) {
-                    //             sameColors.push(ball)
-                    //         } else { // if the streak was broken, append the new one to the empty array
-                    //             console.log("streak was broken");
-                    //             sameColors = []
-                    //             sameColors.push(ball);
-                    //             isBroken = false
-                    //         }
-                    //         // console.log("2) ");
-                    //     } else {
-                    //         // console.log("Colors not matching");
-                    //         // console.log("3) ");
-                    //         // there was an existing match in the array
-                    //         if (sameColors.length >= this.gv.matchingBalls) {
-                    //             // Finalize the existing match
-                    //             this.ballsToDelete.push(sameColors);
-                    //         }
-                    //         // empty the list, because the ball colors do not match
-                    //         sameColors = [];
-                    //         // push a ball as a first one
-                    //         sameColors.push(ball)
-                    //         // streak is not broken, cuz id didn't have a chance to be so
-                    //         isBroken = false;
-                    //     }
-                    // }
 
                 } else { // the field is not a ball
                     // if the field is not a ball, break streak and clear matching array
@@ -532,8 +509,8 @@ export default class Board {
     }
 
     /**
- * Inside of matchVertically's double for
- */
+    * Inside of matchVertically's double for
+    */
     appendBallOrNot(isBroken: boolean, sameColors: Ball[], y: number, x: number) {
         let ball: Ball = this.gv.ballsOnBoard.find((el) => { return el.y == y && el.x == x })
 
@@ -590,16 +567,27 @@ export default class Board {
                     div.removeChild(div.childNodes[0]);
                     // add a point
                     this.gv.points++;
-                    // this.updatePoints()
+                    this.updatePoints()
 
                     // Get ball in ballsOnBoard index
                     let index = this.gv.ballsOnBoard.indexOf(ball);
                     // remove balls from the table 
                     this.gv.ballsOnBoard.splice(index, 1);
+                    this.deletedBalls = true;
                 }
             }
         }
-        console.log(this.gv.ballsOnBoard);
-        console.log(this.ballsToDelete);
+        if (this.ballsToDelete.length == 0) {
+            this.deletedBalls = false;
+        } else {
+            this.ballsToDelete = [];
+            console.log(this.gv.ballsOnBoard);
+            console.log(this.ballsToDelete);
+        }
+    }
+
+    updatePoints() {
+        let div: HTMLDivElement = document.getElementById("points") as HTMLDivElement;
+        div.innerText = `Points: ${this.gv.points}`;
     }
 }

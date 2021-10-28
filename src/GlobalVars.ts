@@ -45,6 +45,7 @@ export default class GlobalVars {
     validStart: boolean = true;
 
     points: number = 0;
+    gameOver: boolean = false;
 
     constructor() {
         // Something
