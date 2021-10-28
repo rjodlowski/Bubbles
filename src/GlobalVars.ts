@@ -25,14 +25,6 @@ export default class GlobalVars {
         "yellow",
         "black",
     ];
-    ballNeonColors: string[] = [
-        "red",
-        "green",
-        "blue",
-        "orange",
-        "yellow",
-        "black",
-    ];
     incomingBalls: Ball[] = [];
     ballsOnBoard: Ball[] = [];
     ballsPerRound: number = 3;

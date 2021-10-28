@@ -18,7 +18,7 @@ Base (max 100%):
     50% - separate files, OOP + types
     20% - static, midificators, scopes (public), interfaces
     20% - using a module loader
-    // 10% - using at least one decorator
+    10% - using at least one decorator
 
 Points (max 5p):
     [L1]
@@ -35,7 +35,7 @@ Points (max 5p):
     [L5]
         0.5p - generated documentation
 
-Total: 90% * 5p = 4.5p
+Total: 100% * 5p = 5p
 
 =====================================
 matches 
