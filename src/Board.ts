@@ -121,7 +121,10 @@ export default class Board {
                 // scout for matches after computer added new balls
                 this.matchVertically();
                 this.matchHorizontally();
-                // this.matchDiagonally();
+                console.clear()
+                this.matchDiagonally();
+                // console.clear()
+                this.deleteBalls();
                 // Enable ball selection
                 this.gv.ballsCanBeSelected = true;
             }, 2000);
@@ -383,9 +386,154 @@ export default class Board {
         console.log(this.ballsToDelete);
     }
 
+    matchDiagonally() {
+        let part = 0;
+        let limit = this.gv.width - 1;
+        console.clear();
+        let arrayToDelete: Ball[][] = [];
+
+        for (let part: number = 0; part < 4; part++) {
+            let matchesFound: Ball[] = []
+
+            switch (part) {
+                case 0: // top left -> middle
+                    let a = (i: number) => {
+                        let sameColors: Ball[] = []
+                        let isBroken: boolean = false;
+                        let x: number = i;
+
+                        for (let y: number = 0; y <= i; y++) {
+                            if (x >= 0) {
+                                let el: HTMLDivElement = document.getElementById(Board.arrayToId([y, x])) as HTMLDivElement
+
+                                if (el.childElementCount > 0) {
+                                    let res = this.appendBallOrNot(isBroken, sameColors, y, x)
+                                    sameColors = res.colors;
+                                    isBroken = res.broken;
+
+                                } else {
+                                    if (sameColors.length > 0) {
+                                        isBroken = true;
+                                    }
+                                }
+                            }
+                            x--
+                        }
+                        if (sameColors.length >= this.gv.matchingBalls) {
+                            this.ballsToDelete.push(sameColors);
+                        }
+                        i > 0 ? a(i - 1) : 0
+                    }
+                    a(limit);
+                    break;
+
+                case 1: //  middle - > bottom right
+
+                    let b = (i: number) => {
+                        let sameColors: Ball[] = []
+                        let isBroken: boolean = false;
+                        let x: number = limit
+
+                        for (let y: number = limit - i; y <= limit; y++) {
+                            if (x >= limit - i) {
+                                let el: HTMLDivElement = document.getElementById(Board.arrayToId([y, x])) as HTMLDivElement
+
+                                if (el.childElementCount > 0) {
+                                    let res = this.appendBallOrNot(isBroken, sameColors, y, x)
+                                    sameColors = res.colors;
+                                    isBroken = res.broken;
+
+                                } else {
+                                    if (sameColors.length > 0) {
+                                        isBroken = true;
+                                    }
+                                }
+                            }
+                            x--
+                        }
+                        if (sameColors.length >= this.gv.matchingBalls) {
+                            this.ballsToDelete.push(sameColors);
+                        }
+                        i > 0 ? b(i - 1) : 0
+                    }
+                    b(limit - 1)
+                    break;
+
+                case 2: // bottom left -> middle
+                    let c = (i: number) => {
+                        let sameColors: Ball[] = []
+                        let isBroken: boolean = false;
+                        let x: number = i;
+
+                        for (let y: number = limit; y >= limit - i; y--) {
+                            if (x >= 0) {
+                                let el: HTMLDivElement = document.getElementById(Board.arrayToId([y, x])) as HTMLDivElement
+
+                                if (el.childElementCount > 0) {
+                                    let res = this.appendBallOrNot(isBroken, sameColors, y, x)
+                                    sameColors = res.colors;
+                                    isBroken = res.broken;
+
+                                } else {
+                                    if (sameColors.length > 0) {
+                                        isBroken = true;
+                                    }
+                                }
+                            }
+                            x--
+                        }
+                        if (sameColors.length >= this.gv.matchingBalls) {
+                            this.ballsToDelete.push(sameColors);
+                        }
+                        i > 0 ? c(i - 1) : 0
+                    }
+                    c(limit);
+                    break;
+
+                case 3: // middle -> top right  
+                    let d = (i: number) => {
+                        let sameColors: Ball[] = []
+                        let isBroken: boolean = false;
+                        let x: number = limit;
+
+                        for (let y: number = i; y >= 0; y--) {
+                            if (x >= limit - i) {
+                                let el: HTMLDivElement = document.getElementById(Board.arrayToId([y, x])) as HTMLDivElement
+
+                                if (el.childElementCount > 0) {
+                                    let res = this.appendBallOrNot(isBroken, sameColors, y, x)
+                                    sameColors = res.colors;
+                                    isBroken = res.broken;
+
+                                } else {
+                                    if (sameColors.length > 0) {
+                                        isBroken = true;
+                                    }
+                                }
+                            }
+                            x--
+                        }
+                        if (sameColors.length >= this.gv.matchingBalls) {
+                            this.ballsToDelete.push(sameColors);
+                        }
+                        i > 0 ? d(i - 1) : 0
+                    }
+                    d(limit - 1)
+                    break;
+
+                default:
+                    console.log("lol");
+
+                    break;
+
+            }
+            console.log(`part${part}`, matchesFound);
+        }
+    }
+
     /**
-     * Inside of matchVertically's double for
-     */
+ * Inside of matchVertically's double for
+ */
     appendBallOrNot(isBroken: boolean, sameColors: Ball[], y: number, x: number) {
         let ball: Ball = this.gv.ballsOnBoard.find((el) => { return el.y == y && el.x == x })
 
@@ -424,90 +572,34 @@ export default class Board {
         return res;
     }
 
-    matchDiagonally() {
-        let part = 0;
-        let limit = this.gv.width - 1;
-        console.clear();
-        let arrayToDelete: Ball[][] = [];
 
-        for (let part: number = 0; part < 4; part++) {
-            let matchesFound: Ball[] = []
+    deleteBalls() {
+        console.log(this.gv.ballsOnBoard);
+        console.log(this.ballsToDelete);
+        for (let i: number = 0; i < this.ballsToDelete.length; i++) {
+            let arr: Ball[] = this.ballsToDelete[i]
+            for (let j: number = 0; j < arr.length; j++) {
+                let ballToDelete: Ball = arr[j];
+                let foundInBallsOnBoard = this.gv.ballsOnBoard.filter((el) => { return el.x == ballToDelete.x && el.y == ballToDelete.y })
 
-            switch (part) {
-                case 0: // top left -> middle
+                if (foundInBallsOnBoard.length > 0) {
+                    console.log("Ball found");
+                    // remove balls from the gameboard
+                    let ball: Ball = foundInBallsOnBoard[0];
+                    let div: HTMLDivElement = document.getElementById(Board.arrayToId([ball.y, ball.x])) as HTMLDivElement;
+                    div.removeChild(div.childNodes[0]);
+                    // add a point
+                    this.gv.points++;
+                    // this.updatePoints()
 
-                    let a = (i: number) => {
-                        // console.log("-----")
-                        let x: number = i;
-                        for (let y: number = 0; y <= i; y++) {
-                            if (x >= 0) {
-
-                                // document.getElementById(Board.arrayToId([y, x])).style.backgroundColor = "pink"
-                                // console.log(y, x);
-                            }
-                            x--
-                        }
-                        i > 0 ? a(i - 1) : 0
-                    }
-                    a(limit);
-                    break;
-
-                case 1: //  middle - > bottom right
-
-                    let b = (i: number) => {
-                        console.log("-----")
-                        let x: number = limit
-                        for (let y: number = limit - i; y <= limit; y++) {
-                            if (x >= limit - i) {
-                                // document.getElementById(Board.arrayToId([y, x])).style.backgroundColor = "purple"
-                                // console.log(y, x);
-                            }
-                            x--
-                        }
-                        i > 0 ? b(i - 1) : 0
-                    }
-                    b(limit - 1)
-                    break;
-
-                case 2: // bottom left -> middle
-                    let c = (i: number) => {
-                        console.log("-----")
-                        let x: number = i;
-                        for (let y: number = limit; y >= limit - i; y--) {
-                            if (x >= 0) {
-                                // document.getElementById(Board.arrayToId([y, x])).style.backgroundColor = "lightblue"
-                                // console.log(y, x);
-                            }
-                            x--
-                        }
-                        i > 0 ? c(i - 1) : 0
-                    }
-                    c(limit);
-                    break;
-
-                case 3: // middle -> top right  
-                    let d = (i: number) => {
-                        console.log("-----")
-                        let x: number = limit;
-                        for (let y: number = i; y >= 0; y--) {
-                            if (x >= limit - i) {
-                                // document.getElementById(Board.arrayToId([y, x])).style.backgroundColor = "brown"
-                                // console.log(y, x);
-                            }
-                            x--
-                        }
-                        i > 0 ? d(i - 1) : 0
-                    }
-                    d(limit - 1)
-                    break;
-
-                default:
-                    console.log("lol");
-
-                    break;
-
+                    // Get ball in ballsOnBoard index
+                    let index = this.gv.ballsOnBoard.indexOf(ball);
+                    // remove balls from the table 
+                    this.gv.ballsOnBoard.splice(index, 1);
+                }
             }
-            console.log(`part${part}`, matchesFound);
         }
+        console.log(this.gv.ballsOnBoard);
+        console.log(this.ballsToDelete);
     }
 }

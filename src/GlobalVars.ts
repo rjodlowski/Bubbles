@@ -44,6 +44,7 @@ export default class GlobalVars {
     mouseOverPathfinding: boolean = false;
     validStart: boolean = true;
 
+    points: number = 0;
 
     constructor() {
         // Something
