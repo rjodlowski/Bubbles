@@ -37,6 +37,16 @@ Points (max 5p):
 
 Total: 90% * 3.5p = 3.15p
 
+=====================================
+matches 
+if the element is a ball, decide what to do
+
+else, the element is not a ball, which means, that if there were balls in a list before,
+their streak is broken and the list is emptied
+
+on the start, streak is not broken
+if the list is empty, add a ball
+
 
 ------------------------------------------------------------
 [0] [1] [2] [3] [] []                           tab[y][y]   tab[y-i][y]

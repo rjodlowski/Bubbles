@@ -16,6 +16,7 @@ export default class Board {
     // HTML elements
     incomingBalls: Ball[];
     gameBalls: Ball[];
+    ballsToDelete: Ball[][];
 
     constructor(globalVars: GlobalVars) {
 
@@ -30,6 +31,7 @@ export default class Board {
 
         this.incomingBalls = []
         this.gameBalls = [];
+        this.ballsToDelete = [];
     }
 
     /**
@@ -118,7 +120,8 @@ export default class Board {
                 // console.clear();
                 // scout for matches after computer added new balls
                 this.matchVertically();
-                this.matchDiagonally();
+                this.matchHorizontally();
+                // this.matchDiagonally();
                 // Enable ball selection
                 this.gv.ballsCanBeSelected = true;
             }, 2000);
@@ -283,10 +286,11 @@ export default class Board {
         // console.log(this.gv.ballsOnBoard);
 
 
-        let ballsToDelete: Ball[][] = []
+        // let ballsToDelete: Ball[][] = []
         for (let x: number = 0; x < this.gv.width; x++) {
             let sameColors: Ball[] = []
             // console.log('==================');
+            let isBroken: boolean = false;
 
 
             for (let y: number = 0; y < this.gv.height; y++) {
@@ -294,52 +298,141 @@ export default class Board {
 
                 // If there is a ball inside
                 if (el.childElementCount > 0) {
-                    let ball: Ball = this.gv.ballsOnBoard.find((el) => { return el.y == y && el.x == x })
-                    // Weird error with different ball.color attibute and actual background color
-                    // ball.color = ball.ball.style.backgroundColor;
-                    // console.log("test: ", ball.color, ball.ball.style.backgroundColor);
-                    // Konsola przekłamuje wartości? działa, mimo, że konsola pokazuje, że nie działa
+                    console.log(isBroken);
 
-                    // If this is the first occurence
-                    if (sameColors.length == 0) {
-                        // console.log("1) ");
-                        sameColors.push(ball)
+                    let res = this.appendBallOrNot(isBroken, sameColors, y, x)
+                    sameColors = res.colors;
+                    isBroken = res.broken;
 
-                        // Else - There are already balls in the array
-                    } else {
-                        // As long as colors match with the last one, append:
-                        if (sameColors[sameColors.length - 1].color == ball.color) {
-                            // console.log("2) ");
-                            sameColors.push(ball)
-                        } else {
-                            // console.log("3) ");
-                            // console.log("Colors not matching");
-                            // console.log("przed", ballsToDelete, sameColors, ball);
-                            if (sameColors.length >= this.gv.matchingBalls) {
-                                ballsToDelete.push(sameColors);
-                            }
-                            sameColors = [];
-                            sameColors.push(ball)
-                            // console.log("po", ballsToDelete, sameColors, ball);
-                        }
+                    // let ball: Ball = this.gv.ballsOnBoard.find((el) => { return el.y == y && el.x == x })
+                    // // If this is the first occurence
+                    // if (sameColors.length == 0) {
+                    //     // console.log("1) ");
+                    //     sameColors.push(ball)
+                    //     isBroken = false;
+
+                    //     // Else - There are already balls in the array
+                    // } else {
+                    //     // As long as colors match with the last one, append:
+                    //     if (sameColors[sameColors.length - 1].color == ball.color) {
+                    //         // if streak was not broken, append similarly colored ball
+                    //         if (!isBroken) {
+                    //             sameColors.push(ball)
+                    //         } else { // if the streak was broken, append the new one to the empty array
+                    //             console.log("streak was broken");
+                    //             sameColors = []
+                    //             sameColors.push(ball);
+                    //             isBroken = false
+                    //         }
+                    //         // console.log("2) ");
+                    //     } else {
+                    //         // console.log("Colors not matching");
+                    //         // console.log("3) ");
+                    //         // there was an existing match in the array
+                    //         if (sameColors.length >= this.gv.matchingBalls) {
+                    //             // Finalize the existing match
+                    //             this.ballsToDelete.push(sameColors);
+                    //         }
+                    //         // empty the list, because the ball colors do not match
+                    //         sameColors = [];
+                    //         // push a ball as a first one
+                    //         sameColors.push(ball)
+                    //         // streak is not broken, cuz id didn't have a chance to be so
+                    //         isBroken = false;
+                    //     }
+                    // }
+
+                } else { // the field is not a ball
+                    // if the field is not a ball, break streak and clear matching array
+                    if (sameColors.length > 0) {
+                        isBroken = true;
                     }
                 }
             }
             if (sameColors.length >= this.gv.matchingBalls) {
-                ballsToDelete.push(sameColors);
+                this.ballsToDelete.push(sameColors);
             }
         }
-        console.log(ballsToDelete);
+        console.log(this.ballsToDelete);
+    }
 
+    matchHorizontally() {
+        console.log("Matching vertically");
+        for (let y: number = 0; y < this.gv.width; y++) {
+            let sameColors: Ball[] = []
+            let isBroken: boolean = false;
+
+            for (let x: number = 0; x < this.gv.height; x++) {
+                let el: HTMLDivElement = document.getElementById(Board.arrayToId([y, x])) as HTMLDivElement
+
+                if (el.childElementCount > 0) {
+                    let res = this.appendBallOrNot(isBroken, sameColors, y, x)
+                    sameColors = res.colors;
+                    isBroken = res.broken;
+
+                } else {
+                    if (sameColors.length > 0) {
+                        isBroken = true;
+                    }
+                }
+            }
+            if (sameColors.length >= this.gv.matchingBalls) {
+                this.ballsToDelete.push(sameColors);
+            }
+        }
+        console.log(this.ballsToDelete);
+    }
+
+    /**
+     * Inside of matchVertically's double for
+     */
+    appendBallOrNot(isBroken: boolean, sameColors: Ball[], y: number, x: number) {
+        let ball: Ball = this.gv.ballsOnBoard.find((el) => { return el.y == y && el.x == x })
+
+        if (sameColors.length == 0) {
+            sameColors.push(ball);
+            isBroken = false;
+
+        } else {
+            if (sameColors[sameColors.length - 1].color == ball.color) {
+                if (!isBroken) {
+                    sameColors.push(ball);
+                } else {
+                    console.log("was broken");
+                    if (sameColors.length >= this.gv.matchingBalls) {
+                        this.ballsToDelete.push(sameColors);
+                    }
+                    sameColors = []
+                    sameColors.push(ball);
+                    isBroken = false
+                }
+            } else {
+                if (sameColors.length >= this.gv.matchingBalls) {
+                    this.ballsToDelete.push(sameColors);
+                }
+                sameColors = [];
+                sameColors.push(ball);
+                isBroken = false;
+            }
+        }
+
+        let res = {
+            broken: isBroken,
+            colors: sameColors
+        }
+
+        return res;
     }
 
     matchDiagonally() {
         let part = 0;
         let limit = this.gv.width - 1;
         console.clear();
+        let arrayToDelete: Ball[][] = [];
 
         for (let part: number = 0; part < 4; part++) {
-            console.log(`part${part}`);
+            let matchesFound: Ball[] = []
+
             switch (part) {
                 case 0: // top left -> middle
 
@@ -348,6 +441,7 @@ export default class Board {
                         let x: number = i;
                         for (let y: number = 0; y <= i; y++) {
                             if (x >= 0) {
+
                                 // document.getElementById(Board.arrayToId([y, x])).style.backgroundColor = "pink"
                                 // console.log(y, x);
                             }
@@ -411,7 +505,9 @@ export default class Board {
                     console.log("lol");
 
                     break;
+
             }
+            console.log(`part${part}`, matchesFound);
         }
     }
 }
