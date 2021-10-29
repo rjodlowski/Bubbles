@@ -2,6 +2,7 @@ import GlobalVars from "./GlobalVars";
 import Pathfinding2 from "./Pathfinding2";
 import Ball from "./Ball";
 import timer from "./decorartors/timer";
+import invert from "./decorartors/invert";
 
 export default class Board {
     // Foreign classes
@@ -41,6 +42,8 @@ export default class Board {
      * Generates the main table of divs,
      * temporarily also the "More button"
      */
+
+    // @invert
     generate() {
         let table: HTMLDivElement = document.createElement("div");
         table.id = "gameTable";
